@@ -74,7 +74,11 @@ export default function AnekdotGenerator({ onBack, ppmData }: AnekdotGeneratorPr
     
     setLoading(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("API key is missing. Please set GEMINI_API_KEY.");
+      }
+      const ai = new GoogleGenAI({ apiKey });
       
       const prompt = `
         Buatkan deskripsi naratif untuk Catatan Anekdot anak TK (Usia 5-6 tahun).

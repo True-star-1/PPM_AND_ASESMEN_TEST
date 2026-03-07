@@ -1,6 +1,17 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+let aiInstance: GoogleGenAI | null = null;
+
+function getAI() {
+  if (!aiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("API key must be set when using the Gemini API. Please set GEMINI_API_KEY in your environment variables.");
+    }
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+}
 
 export const ppmSchema = {
   type: Type.OBJECT,
@@ -92,6 +103,7 @@ export const ppmSchema = {
 };
 
 export async function generatePPM(prompt: string) {
+  const ai = getAI();
   const model = "gemini-3-flash-preview";
   const response = await ai.models.generateContent({
     model,
