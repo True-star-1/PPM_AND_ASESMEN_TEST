@@ -1,113 +1,39 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import OpenAI from "openai";
 
-let aiInstance: GoogleGenAI | null = null;
+let clientInstance: OpenAI | null = null;
 
-function getAI() {
-  if (!aiInstance) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error("API key must be set when using the Gemini API. Please set GEMINI_API_KEY in your environment variables.");
+function getClient() {
+  if (!clientInstance) {
+    const token = process.env.GITHUB_TOKEN;
+    if (!token) {
+      throw new Error("GitHub Token is missing. Please set GITHUB_TOKEN in your environment variables.");
     }
-    aiInstance = new GoogleGenAI({ apiKey });
+    clientInstance = new OpenAI({
+      baseURL: "https://models.inference.ai.azure.com",
+      apiKey: token,
+      dangerouslyAllowBrowser: true
+    });
   }
-  return aiInstance;
+  return clientInstance;
 }
 
-export const ppmSchema = {
-  type: Type.OBJECT,
-  properties: {
-    informasiUmum: {
-      type: Type.OBJECT,
-      properties: {
-        tema: { type: Type.STRING },
-        subTema: { type: Type.STRING },
-        usia: { type: Type.STRING },
-        mingguSemester: { type: Type.STRING },
-        alokasiWaktu: { type: Type.STRING },
-        hariTanggal: { type: Type.STRING },
-      },
-      required: ["tema", "subTema", "usia", "mingguSemester", "alokasiWaktu", "hariTanggal"],
-    },
-    asesmenAwal: {
-      type: Type.OBJECT,
-      properties: {
-        deskripsi: { type: Type.STRING },
-        poinPoin: { type: Type.ARRAY, items: { type: Type.STRING } },
-        instrumen: { type: Type.ARRAY, items: { type: Type.STRING } },
-      },
-      required: ["deskripsi", "poinPoin", "instrumen"],
-    },
-    identifikasi: {
-      type: Type.OBJECT,
-      properties: {
-        dimensiProfilLulusan: { type: Type.ARRAY, items: { type: Type.STRING } },
-      },
-      required: ["dimensiProfilLulusan"],
-    },
-    desainPembelajaran: {
-      type: Type.OBJECT,
-      properties: {
-        tujuanPembelajaran: { type: Type.ARRAY, items: { type: Type.STRING } },
-        praktikPedagogis: { type: Type.ARRAY, items: { type: Type.STRING } },
-        kemitraan: {
-          type: Type.OBJECT,
-          properties: {
-            orangTua: { type: Type.ARRAY, items: { type: Type.STRING } },
-            lingkunganSekolah: { type: Type.ARRAY, items: { type: Type.STRING } },
-            lingkunganPembelajaran: { type: Type.ARRAY, items: { type: Type.STRING } },
-          },
-          required: ["orangTua", "lingkunganSekolah", "lingkunganPembelajaran"],
-        },
-        pemanfaatanDigital: { type: Type.ARRAY, items: { type: Type.STRING } },
-      },
-      required: ["tujuanPembelajaran", "praktikPedagogis", "kemitraan", "pemanfaatanDigital"],
-    },
-    pengalamanBelajar: {
-      type: Type.OBJECT,
-      properties: {
-        penyambutan: { type: Type.STRING },
-        jadwalHarian: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              hari: { type: Type.STRING },
-              kegiatanPenyambutan: { type: Type.STRING },
-              kegiatan: { type: Type.STRING },
-            },
-            required: ["hari", "kegiatanPenyambutan", "kegiatan"],
-          },
-        },
-        pembukaan: { type: Type.ARRAY, items: { type: Type.STRING } },
-        memahami: { type: Type.ARRAY, items: { type: Type.STRING } },
-        kegiatanInti: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              hari: { type: Type.STRING },
-              kegiatan: { type: Type.ARRAY, items: { type: Type.STRING } },
-            },
-            required: ["hari", "kegiatan"],
-          },
-        },
-        mengaplikasi: { type: Type.ARRAY, items: { type: Type.STRING } },
-        merefleksi: { type: Type.ARRAY, items: { type: Type.STRING } },
-        penutup: { type: Type.STRING },
-      },
-      required: ["penyambutan", "jadwalHarian", "pembukaan", "memahami", "kegiatanInti", "mengaplikasi", "merefleksi", "penutup"],
-    },
-    asesmenPembelajaran: { type: Type.STRING },
-  },
-  required: ["informasiUmum", "asesmenAwal", "identifikasi", "desainPembelajaran", "pengalamanBelajar", "asesmenPembelajaran"],
-};
+export async function askAI(prompt: string, systemInstruction: string = "You are a helpful assistant.", jsonMode: boolean = false) {
+  const client = getClient();
+  const response = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      { role: "system", content: systemInstruction },
+      { role: "user", content: prompt }
+    ],
+    response_format: jsonMode ? { type: "json_object" } : undefined,
+    temperature: 0.7,
+  });
+
+  return response.choices[0].message.content || "";
+}
 
 export async function generatePPM(prompt: string) {
-  const ai = getAI();
-  const model = "gemini-3-flash-preview";
-  const response = await ai.models.generateContent({
-    model,
-    contents: `Buatkan Perencanaan Pembelajaran Mendalam (PPM) untuk TK/PAUD dengan tema/topik: ${prompt}. 
+  const systemInstruction = `Buatkan Perencanaan Pembelajaran Mendalam (PPM) untuk TK/PAUD. 
     Gunakan bahasa Indonesia yang formal dan edukatif. 
     Pastikan isinya lengkap dan mendalam sesuai dengan kurikulum merdeka PAUD.
     
@@ -115,12 +41,16 @@ export async function generatePPM(prompt: string) {
     - Pada bagian 'jadwalHarian', kolom 'kegiatanPenyambutan' JANGAN diisi dengan jam/waktu (seperti 07.30 - 08.00).
     - Isi 'kegiatanPenyambutan' dengan deskripsi singkat bagaimana guru menyambut anak (contoh: "Penyambutan dengan senyum dan sapa", "Menyambut anak dengan ceria", dll).
     
-    Struktur harus mengikuti skema JSON yang diberikan.`,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: ppmSchema,
-    },
-  });
+    Output HARUS dalam format JSON sesuai skema berikut:
+    {
+      "informasiUmum": { "tema": "", "subTema": "", "usia": "", "mingguSemester": "", "alokasiWaktu": "", "hariTanggal": "" },
+      "asesmenAwal": { "deskripsi": "", "poinPoin": [], "instrumen": [] },
+      "identifikasi": { "dimensiProfilLulusan": [] },
+      "desainPembelajaran": { "tujuanPembelajaran": [], "praktikPedagogis": [], "kemitraan": { "orangTua": [], "lingkunganSekolah": [], "lingkunganPembelajaran": [] }, "pemanfaatanDigital": [] },
+      "pengalamanBelajar": { "penyambutan": "", "jadwalHarian": [{ "hari": "", "kegiatanPenyambutan": "", "kegiatan": "" }], "pembukaan": [], "memahami": [], "kegiatanInti": [{ "hari": "", "kegiatan": [] }], "mengaplikasi": [], "merefleksi": [], "penutup": "" },
+      "asesmenPembelajaran": ""
+    }`;
 
-  return JSON.parse(response.text || "{}");
+  const result = await askAI(`Tema/topik: ${prompt}`, systemInstruction, true);
+  return JSON.parse(result);
 }

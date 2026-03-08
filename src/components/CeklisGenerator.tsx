@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { PPMData } from '../services/pdfService';
 import { ArrowLeft, BookOpen, Plus, Trash2, Download, Sparkles, Loader2, Save, Users, CheckSquare } from 'lucide-react';
 import { motion } from 'motion/react';
-import { GoogleGenAI } from "@google/genai";
+import { askAI } from '../services/geminiService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -95,7 +95,6 @@ export default function CeklisGenerator({ onBack, ppmData }: CeklisGeneratorProp
     
     setLoadingAI(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const activities = getActivitiesForDay(selectedDay).join(', ');
       
       const prompt = `
@@ -119,13 +118,7 @@ export default function CeklisGenerator({ onBack, ppmData }: CeklisGeneratorProp
         Pastikan output hanya JSON valid tanpa markdown.
       `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: { responseMimeType: 'application/json' }
-      });
-
-      const text = response.text?.trim() || '[]';
+      const text = await askAI(prompt, "You are an expert in early childhood education assessment.", true);
       const generatedData = JSON.parse(text);
 
       const newItems: AssessmentItem[] = generatedData.map((item: any, index: number) => ({

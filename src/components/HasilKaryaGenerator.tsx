@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { PPMData } from '../services/pdfService';
 import { ArrowLeft, Palette, Plus, Trash2, Download, Sparkles, Loader2, Save, Image as ImageIcon, X, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
-import { GoogleGenAI } from "@google/genai";
+import { askAI } from '../services/geminiService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -75,8 +75,6 @@ export default function HasilKaryaGenerator({ onBack, ppmData }: HasilKaryaGener
     setLoadingAI(true);
       let analysis = '';
       try {
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-        
         const prompt = `
           Saya adalah guru TK. Saya ingin membuat analisis capaian perkembangan anak berdasarkan hasil karyanya.
           
@@ -94,12 +92,7 @@ export default function HasilKaryaGenerator({ onBack, ppmData }: HasilKaryaGener
           Jangan gunakan bullet points atau penomoran. Langsung deskripsi naratif.
         `;
 
-        const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: prompt
-        });
-
-        analysis = response.text?.trim() || '';
+        analysis = await askAI(prompt, "You are an expert in early childhood education assessment.");
       } catch (error: any) {
         // console.error('Error generating analysis:', error); // Silent console error
         const errorMsg = error.message || JSON.stringify(error);

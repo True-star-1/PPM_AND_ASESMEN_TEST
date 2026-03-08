@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { PPMData } from '../services/pdfService';
 import { ArrowLeft, BookOpen, Plus, Trash2, Download, Sparkles, Loader2, Save } from 'lucide-react';
 import { motion } from 'motion/react';
-import { GoogleGenAI } from "@google/genai";
+import { askAI } from '../services/geminiService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -74,12 +74,6 @@ export default function AnekdotGenerator({ onBack, ppmData }: AnekdotGeneratorPr
     
     setLoading(true);
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error("API key is missing. Please set GEMINI_API_KEY.");
-      }
-      const ai = new GoogleGenAI({ apiKey });
-      
       const prompt = `
         Buatkan deskripsi naratif untuk Catatan Anekdot anak TK (Usia 5-6 tahun).
         
@@ -96,12 +90,7 @@ export default function AnekdotGenerator({ onBack, ppmData }: AnekdotGeneratorPr
         - Jangan gunakan markdown atau bullet points. Hanya teks paragraf.
       `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt
-      });
-      
-      const description = response.text?.trim() || '';
+      const description = await askAI(prompt, "You are a pedagogical expert for early childhood education.");
       
       const dateDisplay = selectedDate 
         ? formatDate(selectedDate)
