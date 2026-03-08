@@ -17,14 +17,14 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
   const [error, setError] = useState<string | null>(null);
 
   const [schoolInfo, setSchoolInfo] = useState({
-    schoolName: initialData?.schoolName || 'TK BALEGONDO 1',
-    academicYear: initialData?.academicYear || 'TAHUN PELAJARAN 2025/2026',
-    principalName: initialData?.principalName || 'KUNLISTYANI, S.Pd',
-    teacherName: initialData?.teacherName || 'NABILA ANIN SAU\'DAH',
-    usia: initialData?.informasiUmum?.usia || '5-6 Tahun (Kelompok B)',
-    mingguSemester: initialData?.informasiUmum?.mingguSemester || 'Minggu ke-10 / Semester II',
-    alokasiWaktu: initialData?.informasiUmum?.alokasiWaktu || '210 Menit per Hari',
-    hariTanggal: initialData?.informasiUmum?.hariTanggal || 'Senin - Jumat / Mei 2026',
+    schoolName: initialData?.schoolName || '',
+    academicYear: initialData?.academicYear || '',
+    principalName: initialData?.principalName || '',
+    teacherName: initialData?.teacherName || '',
+    usia: initialData?.informasiUmum?.usia || '',
+    mingguSemester: initialData?.informasiUmum?.mingguSemester || '',
+    alokasiWaktu: initialData?.informasiUmum?.alokasiWaktu || '',
+    hariTanggal: initialData?.informasiUmum?.hariTanggal || '',
   });
 
   // Update prompt if initialData exists (optional, maybe extract theme)
@@ -72,7 +72,7 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2ED] text-[#1A1A1A] font-sans p-4 md:p-8">
+    <div className="min-h-screen bg-sky-50 text-[#1A1A1A] font-sans p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <header className="mb-12 text-center relative">
@@ -112,8 +112,9 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
               <input
                 type="text"
                 value={schoolInfo.schoolName}
+                placeholder="Masukkan Nama Sekolah..."
                 onChange={(e) => setSchoolInfo({ ...schoolInfo, schoolName: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
               />
             </div>
             <div>
@@ -121,8 +122,9 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
               <input
                 type="text"
                 value={schoolInfo.academicYear}
+                placeholder="Contoh: 2025/2026"
                 onChange={(e) => setSchoolInfo({ ...schoolInfo, academicYear: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
               />
             </div>
             <div>
@@ -130,8 +132,9 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
               <input
                 type="text"
                 value={schoolInfo.usia}
+                placeholder="Contoh: 5-6 Tahun"
                 onChange={(e) => setSchoolInfo({ ...schoolInfo, usia: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
               />
             </div>
             <div>
@@ -139,8 +142,9 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
               <input
                 type="text"
                 value={schoolInfo.mingguSemester}
+                placeholder="Contoh: Minggu 1 / Semester 1"
                 onChange={(e) => setSchoolInfo({ ...schoolInfo, mingguSemester: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
               />
             </div>
             <div>
@@ -148,8 +152,9 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
               <input
                 type="text"
                 value={schoolInfo.alokasiWaktu}
+                placeholder="Contoh: 210 Menit"
                 onChange={(e) => setSchoolInfo({ ...schoolInfo, alokasiWaktu: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
               />
             </div>
             <div>
@@ -157,8 +162,9 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
               <input
                 type="text"
                 value={schoolInfo.hariTanggal}
+                placeholder="Contoh: Senin, 1 Januari 2025"
                 onChange={(e) => setSchoolInfo({ ...schoolInfo, hariTanggal: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
               />
             </div>
           </div>
@@ -189,8 +195,9 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
               <input
                 type="text"
                 value={schoolInfo.principalName}
+                placeholder="Nama Kepala Sekolah..."
                 onChange={(e) => setSchoolInfo({ ...schoolInfo, principalName: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
               />
             </div>
             <div>
@@ -198,8 +205,9 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
               <input
                 type="text"
                 value={schoolInfo.teacherName}
+                placeholder="Nama Guru Kelas..."
                 onChange={(e) => setSchoolInfo({ ...schoolInfo, teacherName: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
               />
             </div>
           </div>
