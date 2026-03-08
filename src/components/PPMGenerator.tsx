@@ -40,11 +40,15 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
     setError(null);
     try {
       const data = await generatePPM(prompt);
+      if (!data) throw new Error("AI tidak memberikan respons.");
+      
       const fullData = {
         ...data,
         ...schoolInfo,
         informasiUmum: {
-          ...data.informasiUmum,
+          ...(data.informasiUmum || {}),
+          tema: data?.informasiUmum?.tema || prompt,
+          subTema: data?.informasiUmum?.subTema || '',
           usia: schoolInfo.usia,
           mingguSemester: schoolInfo.mingguSemester,
           alokasiWaktu: schoolInfo.alokasiWaktu,
@@ -53,9 +57,9 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
       };
       setPpmData(fullData);
       onGenerate(fullData); // Update parent state
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError('Gagal menghasilkan PPM. Silakan coba lagi.');
+      setError(err.message || 'Gagal menghasilkan PPM. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
@@ -247,24 +251,24 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                       <div>
                         <p className="text-[10px] font-bold text-stone-400 uppercase mb-1">Tema</p>
-                        <p className="font-medium">{ppmData.informasiUmum.tema}</p>
+                        <p className="font-medium">{ppmData?.informasiUmum?.tema || '-'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-stone-400 uppercase mb-1">Sub Tema</p>
-                        <p className="font-medium">{ppmData.informasiUmum.subTema}</p>
+                        <p className="font-medium">{ppmData?.informasiUmum?.subTema || '-'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-stone-400 uppercase mb-1">Usia</p>
-                        <p className="font-medium">{ppmData.informasiUmum.usia}</p>
+                        <p className="font-medium">{ppmData?.informasiUmum?.usia || '-'}</p>
                       </div>
                     </div>
                   </section>
 
                   <section>
                     <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-stone-400 mb-4 border-b border-stone-100 pb-2">Asesmen Awal</h4>
-                    <p className="text-stone-600 mb-4 leading-relaxed">{ppmData.asesmenAwal.deskripsi}</p>
+                    <p className="text-stone-600 mb-4 leading-relaxed">{ppmData?.asesmenAwal?.deskripsi || '-'}</p>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {ppmData.asesmenAwal.poinPoin.map((p, i) => (
+                      {ppmData?.asesmenAwal?.poinPoin?.map((p, i) => (
                         <li key={i} className="flex items-start gap-2 text-sm text-stone-600">
                           <span className="text-emerald-500 mt-1">•</span>
                           {p}
@@ -276,7 +280,7 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
                   <section>
                     <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-stone-400 mb-4 border-b border-stone-100 pb-2">Tujuan Pembelajaran</h4>
                     <ul className="space-y-2">
-                      {ppmData.desainPembelajaran.tujuanPembelajaran.map((t, i) => (
+                      {ppmData?.desainPembelajaran?.tujuanPembelajaran?.map((t, i) => (
                         <li key={i} className="flex items-start gap-3 bg-stone-50 p-3 rounded-xl text-sm text-stone-700">
                           <span className="w-6 h-6 rounded-full bg-white border border-stone-200 flex items-center justify-center text-[10px] font-bold shrink-0">{i + 1}</span>
                           {t}
