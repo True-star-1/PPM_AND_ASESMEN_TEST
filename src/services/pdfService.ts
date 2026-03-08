@@ -52,15 +52,18 @@ export const generatePPMPDF = (data: PPMData) => {
     format: 'a4',
   });
 
-  const schoolName = data.schoolName || 'TK BALEGONDO 1';
-  const academicYear = data.academicYear || 'TAHUN PELAJARAN 2025/2026';
+  const schoolName = (data.schoolName || 'TK BALEGONDO 1').toUpperCase();
+  const academicYear = data.academicYear || '2025/2026';
+  const formattedYear = academicYear.toUpperCase().includes('TAHUN PELAJARAN') 
+    ? academicYear.toUpperCase() 
+    : `TAHUN PELAJARAN ${academicYear.toUpperCase()}`;
 
   // Header
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.text('PERENCANAAN PEMBELAJARAN MENDALAM', 148.5, 15, { align: 'center' });
   doc.text(schoolName, 148.5, 22, { align: 'center' });
-  doc.text(academicYear, 148.5, 29, { align: 'center' });
+  doc.text(formattedYear, 148.5, 29, { align: 'center' });
 
   let currentY = 35;
 
@@ -270,7 +273,15 @@ export const generatePPMPDF = (data: PPMData) => {
   doc.text('Kepala Sekolah', 60, finalY + 5, { align: 'center' });
   doc.text(data.principalName || 'KUNLISTYANI, S.Pd', 60, finalY + 30, { align: 'center' });
 
-  doc.text('Guru Kelas B', 230, finalY + 5, { align: 'center' });
+  // Extract "Kelompok A/B" from usia if possible, otherwise default to "Guru Kelas"
+  const usiaText = data.informasiUmum.usia || '';
+  let guruLabel = 'Guru Kelas';
+  if (usiaText.toUpperCase().includes('KELOMPOK A')) guruLabel = 'Guru Kelas A';
+  else if (usiaText.toUpperCase().includes('KELOMPOK B')) guruLabel = 'Guru Kelas B';
+  else if (usiaText.toUpperCase().includes('KELAS A')) guruLabel = 'Guru Kelas A';
+  else if (usiaText.toUpperCase().includes('KELAS B')) guruLabel = 'Guru Kelas B';
+
+  doc.text(guruLabel, 230, finalY + 5, { align: 'center' });
   doc.text(data.teacherName || 'NABILA ANIN SAU\'DAH', 230, finalY + 30, { align: 'center' });
 
   doc.save(`PPM_${data.informasiUmum.tema.replace(/\s+/g, '_')}.pdf`);

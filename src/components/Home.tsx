@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, BookOpen, CheckSquare, Palette, Image, ArrowRight } from 'lucide-react';
+import { Sparkles, BookOpen, CheckSquare, Palette, Image, ArrowRight, ClipboardCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface HomeProps {
@@ -19,40 +19,14 @@ export default function Home({ onNavigate, hasPPMData }: HomeProps) {
       active: true
     },
     {
-      id: 'anekdot',
-      title: 'Catatan Anekdot',
-      description: 'Rekam kejadian bermakna dalam perkembangan anak.',
-      icon: <BookOpen size={32} className="text-blue-600" />,
-      color: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
+      id: 'asesmen-menu',
+      title: 'Asesmen',
+      description: 'Catatan anekdot, ceklis, hasil karya, dan foto berseri.',
+      icon: <ClipboardCheck size={32} className="text-blue-600" />,
+      color: 'bg-white hover:bg-blue-50 border-stone-200',
+      iconBg: 'bg-blue-50',
       textColor: 'text-blue-900',
-      active: hasPPMData
-    },
-    {
-      id: 'ceklist',
-      title: 'Ceklist',
-      description: 'Pantau indikator perkembangan anak secara terstruktur.',
-      icon: <CheckSquare size={32} className="text-purple-600" />,
-      color: 'bg-purple-50 hover:bg-purple-100 border-purple-200',
-      textColor: 'text-purple-900',
-      active: hasPPMData
-    },
-    {
-      id: 'hasilkarya',
-      title: 'Hasil Karya',
-      description: 'Dokumentasikan dan analisis hasil karya anak.',
-      icon: <Palette size={32} className="text-orange-600" />,
-      color: 'bg-orange-50 hover:bg-orange-100 border-orange-200',
-      textColor: 'text-orange-900',
-      active: hasPPMData
-    },
-    {
-      id: 'foto-berseri',
-      title: 'Foto Berseri',
-      description: 'Rangkaian foto kegiatan anak dengan deskripsi.',
-      icon: <Image size={32} className="text-rose-600" />,
-      color: 'bg-rose-50 hover:bg-rose-100 border-rose-200',
-      textColor: 'text-rose-900',
-      active: hasPPMData
+      active: true
     }
   ];
 
@@ -91,9 +65,14 @@ export default function Home({ onNavigate, hasPPMData }: HomeProps) {
                   : 'bg-stone-100 border-stone-200 opacity-60 cursor-not-allowed grayscale-[0.5]'
               }`}
             >
-              <div className="mb-4 bg-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm">
+              <div className={`mb-4 w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${item.iconBg || 'bg-white'}`}>
                 {item.icon}
               </div>
+              {item.subtitle && (
+                <p className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-1">
+                  {item.subtitle}
+                </p>
+              )}
               <h3 className={`text-xl font-bold mb-2 ${item.textColor}`}>
                 {item.title}
               </h3>
@@ -103,7 +82,7 @@ export default function Home({ onNavigate, hasPPMData }: HomeProps) {
               
               {item.active ? (
                 <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">
-                  Buka Menu <ArrowRight size={16} />
+                  {item.id === 'asesmen-menu' ? 'Masuk Aplikasi' : 'Buka Menu'} <ArrowRight size={16} />
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-stone-400 bg-stone-200/50 px-3 py-1 rounded-full w-fit">

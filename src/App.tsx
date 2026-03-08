@@ -5,6 +5,7 @@ import AnekdotGenerator from './components/AnekdotGenerator';
 import CeklisGenerator from './components/CeklisGenerator';
 import HasilKaryaGenerator from './components/HasilKaryaGenerator';
 import FotoBerseriGenerator from './components/FotoBerseriGenerator';
+import AsesmenMenu from './components/AsesmenMenu';
 import { PPMData } from './services/pdfService';
 
 export default function App() {
@@ -19,6 +20,34 @@ export default function App() {
     setPpmData(data);
   };
 
+  const defaultPPMData: PPMData = {
+    schoolName: '',
+    academicYear: '',
+    principalName: '',
+    teacherName: '',
+    informasiUmum: {
+      tema: '',
+      subTema: '',
+      usia: '',
+      mingguSemester: '',
+      alokasiWaktu: '',
+      hariTanggal: ''
+    },
+    asesmenAwal: {
+      deskripsi: '',
+      poinPoin: []
+    },
+    desainPembelajaran: {
+      tujuanPembelajaran: [],
+      kegiatanPembelajaran: []
+    },
+    pengalamanBelajar: {
+      kegiatanPembukaan: [],
+      kegiatanInti: [],
+      kegiatanPenutup: []
+    }
+  };
+
   return (
     <>
       {currentPage === 'home' && <Home onNavigate={navigateTo} hasPPMData={!!ppmData} />}
@@ -29,28 +58,34 @@ export default function App() {
           initialData={ppmData}
         />
       )}
-      {currentPage === 'anekdot' && ppmData && (
+      {currentPage === 'asesmen-menu' && (
+        <AsesmenMenu 
+          onBack={() => navigateTo('home')}
+          onNavigate={navigateTo}
+        />
+      )}
+      {currentPage === 'anekdot' && (
         <AnekdotGenerator 
-          onBack={() => navigateTo('home')} 
-          ppmData={ppmData}
+          onBack={() => navigateTo('asesmen-menu')} 
+          ppmData={ppmData || defaultPPMData}
         />
       )}
-      {currentPage === 'ceklist' && ppmData && (
+      {currentPage === 'ceklist' && (
         <CeklisGenerator 
-          onBack={() => navigateTo('home')} 
-          ppmData={ppmData}
+          onBack={() => navigateTo('asesmen-menu')} 
+          ppmData={ppmData || defaultPPMData}
         />
       )}
-      {currentPage === 'hasilkarya' && ppmData && (
+      {currentPage === 'hasilkarya' && (
         <HasilKaryaGenerator 
-          onBack={() => navigateTo('home')} 
-          ppmData={ppmData}
+          onBack={() => navigateTo('asesmen-menu')} 
+          ppmData={ppmData || defaultPPMData}
         />
       )}
-      {currentPage === 'foto-berseri' && ppmData && (
+      {currentPage === 'foto-berseri' && (
         <FotoBerseriGenerator 
-          onBack={() => navigateTo('home')} 
-          ppmData={ppmData}
+          onBack={() => navigateTo('asesmen-menu')} 
+          ppmData={ppmData || defaultPPMData}
         />
       )}
     </>

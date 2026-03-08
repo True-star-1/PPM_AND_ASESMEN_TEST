@@ -27,6 +27,20 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
     hariTanggal: initialData?.informasiUmum?.hariTanggal || '',
   });
 
+  const [isCustomUsia, setIsCustomUsia] = useState(false);
+  const [isCustomAcademicYear, setIsCustomAcademicYear] = useState(false);
+
+  const usiaOptions = [
+    '4 - 5 Tahun / Kelompok A',
+    '5 - 6 Tahun / Kelompok B'
+  ];
+
+  const academicYearOptions = [
+    '2025/2026',
+    '2026/2027',
+    '2027/2028'
+  ];
+
   // Update prompt if initialData exists (optional, maybe extract theme)
   React.useEffect(() => {
     if (initialData) {
@@ -119,23 +133,81 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
             </div>
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-stone-400 mb-2">Tahun Pelajaran</label>
-              <input
-                type="text"
-                value={schoolInfo.academicYear}
-                placeholder="Contoh: 2025/2026"
-                onChange={(e) => setSchoolInfo({ ...schoolInfo, academicYear: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
-              />
+              {!isCustomAcademicYear ? (
+                <select
+                  value={academicYearOptions.includes(schoolInfo.academicYear) ? schoolInfo.academicYear : ''}
+                  onChange={(e) => {
+                    if (e.target.value === 'custom') {
+                      setIsCustomAcademicYear(true);
+                      setSchoolInfo({ ...schoolInfo, academicYear: '' });
+                    } else {
+                      setSchoolInfo({ ...schoolInfo, academicYear: e.target.value });
+                    }
+                  }}
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all appearance-none cursor-pointer"
+                >
+                  <option value="" disabled>Pilih Tahun Pelajaran...</option>
+                  {academicYearOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                  <option value="custom">Ketik Sendiri...</option>
+                </select>
+              ) : (
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={schoolInfo.academicYear}
+                    placeholder="Contoh: 2025/2026"
+                    onChange={(e) => setSchoolInfo({ ...schoolInfo, academicYear: e.target.value })}
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
+                  />
+                  <button 
+                    onClick={() => setIsCustomAcademicYear(false)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-sky-600 hover:text-sky-700"
+                  >
+                    Batal
+                  </button>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-stone-400 mb-2">Usia</label>
-              <input
-                type="text"
-                value={schoolInfo.usia}
-                placeholder="Contoh: 5-6 Tahun"
-                onChange={(e) => setSchoolInfo({ ...schoolInfo, usia: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
-              />
+              {!isCustomUsia ? (
+                <select
+                  value={usiaOptions.includes(schoolInfo.usia) ? schoolInfo.usia : ''}
+                  onChange={(e) => {
+                    if (e.target.value === 'custom') {
+                      setIsCustomUsia(true);
+                      setSchoolInfo({ ...schoolInfo, usia: '' });
+                    } else {
+                      setSchoolInfo({ ...schoolInfo, usia: e.target.value });
+                    }
+                  }}
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all appearance-none cursor-pointer"
+                >
+                  <option value="" disabled>Pilih Kelompok Usia...</option>
+                  {usiaOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                  <option value="custom">Ketik Sendiri...</option>
+                </select>
+              ) : (
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={schoolInfo.usia}
+                    placeholder="Contoh: 5-6 Tahun"
+                    onChange={(e) => setSchoolInfo({ ...schoolInfo, usia: e.target.value })}
+                    className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
+                  />
+                  <button 
+                    onClick={() => setIsCustomUsia(false)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-sky-600 hover:text-sky-700"
+                  >
+                    Batal
+                  </button>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-xs font-bold uppercase tracking-widest text-stone-400 mb-2">Minggu / Semester</label>
@@ -162,7 +234,7 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
               <input
                 type="text"
                 value={schoolInfo.hariTanggal}
-                placeholder="Contoh: Senin, 1 Januari 2025"
+                placeholder="Contoh: Senin - Jumat / Januari 2026"
                 onChange={(e) => setSchoolInfo({ ...schoolInfo, hariTanggal: e.target.value })}
                 className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
               />

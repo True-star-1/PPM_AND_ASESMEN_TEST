@@ -281,7 +281,7 @@ export default function CeklisGenerator({ onBack, ppmData }: CeklisGeneratorProp
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2ED] text-[#1A1A1A] font-sans p-4 md:p-8">
+    <div className="min-h-screen bg-sky-50 text-[#1A1A1A] font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <header className="mb-8 flex items-center justify-between">
