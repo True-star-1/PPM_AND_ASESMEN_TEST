@@ -9,7 +9,7 @@ export default defineConfig(({mode}) => {
     base: '/',
     plugins: [react(), tailwindcss()],
     define: {
-      'process.env.GITHUB_TOKEN': JSON.stringify(env.GITHUB_TOKEN || ''),
+      'process.env.GITHUB_TOKENS': JSON.stringify(env.GITHUB_TOKENS || ''),
     },
     resolve: {
       alias: {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { PPMData } from '../services/pdfService';
 import { ArrowLeft, BookOpen, Plus, Trash2, Download, Sparkles, Loader2, Save, Users, CheckSquare } from 'lucide-react';
 import { motion } from 'motion/react';
-import { askAI } from '../services/geminiService';
+import { askAI, cleanJson } from '../services/geminiService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -119,13 +119,26 @@ export default function CeklisGenerator({ onBack, ppmData }: CeklisGeneratorProp
       `;
 
       const text = await askAI(prompt, "You are an expert in early childhood education assessment.", true);
-      const generatedData = JSON.parse(text);
+      const cleaned = cleanJson(text);
+      const generatedData = JSON.parse(cleaned);
 
-      const newItems: AssessmentItem[] = generatedData.map((item: any, index: number) => ({
+      // Pastikan data adalah array (daftar)
+      let dataArray: any[] = [];
+      if (Array.isArray(generatedData)) {
+        dataArray = generatedData;
+      } else if (generatedData.items && Array.isArray(generatedData.items)) {
+        dataArray = generatedData.items;
+      } else if (generatedData.data && Array.isArray(generatedData.data)) {
+        dataArray = generatedData.data;
+      } else {
+        dataArray = [generatedData]; // Bungkus objek tunggal menjadi daftar
+      }
+
+      const newItems: AssessmentItem[] = dataArray.map((item: any, index: number) => ({
         id: Date.now().toString() + index,
-        objective: item.objective,
-        iktp: item.iktp,
-        ratings: {} // Empty ratings initially
+        objective: item.objective || item.tujuan || "Tujuan tidak ditemukan",
+        iktp: item.iktp || item.indikator || "Indikator tidak ditemukan",
+        ratings: {} // Kosongkan rating di awal
       }));
 
       setAssessmentItems(newItems);

@@ -72,8 +72,18 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
       setPpmData(fullData);
       onGenerate(fullData); // Update parent state
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Gagal menghasilkan PPM. Silakan coba lagi.');
+      console.error("PPM Generation Error:", err);
+      let msg = err.message || 'Gagal menghasilkan PPM. Silakan coba lagi.';
+      
+      if (msg.includes('GitHub Tokens are missing')) {
+        msg = "Kunci (Tokens) belum terpasang. Silakan klik ikon Gerigi (Settings) di pojok kanan atas, lalu isi GITHUB_TOKENS dengan kunci Anda dan klik Save. JANGAN LUPA REFRESH HALAMAN (F5) setelah simpan.";
+      } else if (msg.includes('429') || msg.includes('Rate Limit')) {
+        msg = "Semua kunci Anda sedang mencapai batas penggunaan. Silakan tunggu 1-2 menit atau tambahkan kunci baru di Settings.";
+      } else if (msg.includes('401') || msg.includes('invalid')) {
+        msg = "Salah satu kunci GitHub Anda tidak valid. Silakan periksa kembali di menu Settings.";
+      }
+      
+      setError(msg);
     } finally {
       setLoading(false);
     }
