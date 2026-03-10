@@ -108,21 +108,23 @@ export default function CeklisGenerator({ onBack, ppmData }: CeklisGeneratorProp
         Tugas:
         Untuk SETIAP Tujuan Pembelajaran di atas, buatkan 1-2 Indikator Ketercapaian Tujuan Pembelajaran (IKTP) yang spesifik, terukur, dan relevan dengan kegiatan hari ini.
         
-        Format Output JSON (Array of Objects):
-        [
-          {
-            "objective": "Teks Tujuan Pembelajaran Asli",
-            "iktp": "Teks Indikator (poin-poin)"
-          }
-        ]
-        Pastikan output hanya JSON valid tanpa markdown.
+        Format Output JSON:
+        {
+          "items": [
+            {
+              "objective": "Teks Tujuan Pembelajaran Asli",
+              "iktp": "Teks Indikator (poin-poin)"
+            }
+          ]
+        }
+        Pastikan output hanya JSON valid.
       `;
 
       const text = await askAI(prompt, "You are an expert in early childhood education assessment.", true);
       const cleaned = cleanJson(text);
       const generatedData = JSON.parse(cleaned);
 
-      // Pastikan data adalah array (daftar)
+      // Robust parsing to find the array of items
       let dataArray: any[] = [];
       if (Array.isArray(generatedData)) {
         dataArray = generatedData;
@@ -130,16 +132,30 @@ export default function CeklisGenerator({ onBack, ppmData }: CeklisGeneratorProp
         dataArray = generatedData.items;
       } else if (generatedData.data && Array.isArray(generatedData.data)) {
         dataArray = generatedData.data;
+      } else if (generatedData.assessments && Array.isArray(generatedData.assessments)) {
+        dataArray = generatedData.assessments;
       } else {
-        dataArray = [generatedData]; // Bungkus objek tunggal menjadi daftar
+        // Try to find any array property
+        const firstArrayKey = Object.keys(generatedData).find(key => Array.isArray(generatedData[key]));
+        if (firstArrayKey) {
+          dataArray = generatedData[firstArrayKey];
+        } else {
+          dataArray = [generatedData];
+        }
       }
 
-      const newItems: AssessmentItem[] = dataArray.map((item: any, index: number) => ({
-        id: Date.now().toString() + index,
-        objective: item.objective || item.tujuan || "Tujuan tidak ditemukan",
-        iktp: item.iktp || item.indikator || "Indikator tidak ditemukan",
-        ratings: {} // Kosongkan rating di awal
-      }));
+      const newItems: AssessmentItem[] = dataArray.map((item: any, index: number) => {
+        // Fallback for different possible key names from AI
+        const objective = item.objective || item.tujuan || item.tp || item.Tujuan || "Tujuan tidak ditemukan";
+        const iktp = item.iktp || item.indikator || item.indikator_ketercapaian || item.Indikator || "Indikator tidak ditemukan";
+        
+        return {
+          id: Date.now().toString() + index,
+          objective: typeof objective === 'string' ? objective : JSON.stringify(objective),
+          iktp: typeof iktp === 'string' ? iktp : JSON.stringify(iktp),
+          ratings: {}
+        };
+      });
 
       setAssessmentItems(newItems);
 
@@ -297,16 +313,16 @@ export default function CeklisGenerator({ onBack, ppmData }: CeklisGeneratorProp
     <div className="min-h-screen bg-sky-50 text-[#1A1A1A] font-sans p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <header className="mb-8 flex items-center justify-between">
+        <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <button 
             onClick={onBack}
-            className="flex items-center gap-2 text-stone-500 hover:text-stone-800 transition-colors font-medium"
+            className="flex items-center gap-2 text-stone-500 hover:text-stone-800 transition-colors font-medium w-fit"
           >
             <ArrowLeft size={20} />
             Kembali
           </button>
-          <h1 className="text-2xl font-serif font-bold text-stone-800 flex items-center gap-2">
-            <CheckSquare className="text-blue-600" />
+          <h1 className="text-xl md:text-2xl font-serif font-bold text-stone-800 flex items-center gap-2 md:ml-auto">
+            <CheckSquare className="text-blue-600 shrink-0" />
             Ceklis Capaian Perkembangan
           </h1>
         </header>
@@ -375,7 +391,7 @@ export default function CeklisGenerator({ onBack, ppmData }: CeklisGeneratorProp
                 {students.map(student => (
                   <div key={student.id} className="bg-stone-100 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium text-stone-700 group">
                     {student.name}
-                    <button onClick={() => removeStudent(student.id)} className="text-stone-400 hover:text-red-500">
+                    <button onClick={() => removeStudent(student.id)} className="text-stone-500 hover:text-red-500 transition-colors">
                       <Trash2 size={14} />
                     </button>
                   </div>

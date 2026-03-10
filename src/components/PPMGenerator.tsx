@@ -53,7 +53,7 @@ export default function PPMGenerator({ onBack, onGenerate, initialData }: PPMGen
     setLoading(true);
     setError(null);
     try {
-      const data = await generatePPM(prompt);
+      const data = await generatePPM(prompt, schoolInfo);
       if (!data) throw new Error("AI tidak memberikan respons.");
       
       const fullData = {

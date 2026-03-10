@@ -68,11 +68,6 @@ export default function Home({ onNavigate, hasPPMData }: HomeProps) {
               <div className={`mb-4 w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${item.iconBg || 'bg-white'}`}>
                 {item.icon}
               </div>
-              {item.subtitle && (
-                <p className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-1">
-                  {item.subtitle}
-                </p>
-              )}
               <h3 className={`text-xl font-bold mb-2 ${item.textColor}`}>
                 {item.title}
               </h3>
