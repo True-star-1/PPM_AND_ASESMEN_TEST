@@ -16,7 +16,7 @@ function getClients() {
       baseURL: "https://models.inference.ai.azure.com",
       apiKey: token,
       dangerouslyAllowBrowser: true,
-      timeout: 60000 // 60 seconds
+      timeout: 30000 // 30 seconds
     }));
   }
   return clientInstances;
@@ -80,9 +80,9 @@ export async function askAI(prompt: string, systemInstruction: string = "You are
       lastError = error;
       console.error(`AI Error with token ${currentClientIndex}:`, error);
 
-      // If it's a rate limit (429) or a timeout, try the next token
-      if (error.status === 429 || error.name === 'APITimeoutError' || error.message?.includes('timed out')) {
-        console.warn(`Token ${currentClientIndex} hit ${error.name || 'error'}, switching to next token...`);
+      // If it's a rate limit (429), try the next token
+      if (error.status === 429) {
+        console.warn("Rate limit hit, switching to next token...");
         continue; 
       }
 
@@ -106,38 +106,27 @@ export async function askAI(prompt: string, systemInstruction: string = "You are
   throw new Error("Gagal menghubungi layanan AI setelah mencoba semua kunci.");
 }
 
-export async function generatePPM(prompt: string, schoolInfo: any) {
-  const systemInstruction = `Pakar PAUD Kurikulum Merdeka. Buat PPM LENGKAP & UNIK.
+export async function generatePPM(prompt: string) {
+  const systemInstruction = `Buatkan Perencanaan Pembelajaran Mendalam (PPM) untuk TK/PAUD. 
+    Gunakan bahasa Indonesia yang formal dan edukatif. 
+    Pastikan isinya lengkap dan mendalam sesuai dengan kurikulum merdeka PAUD.
     
-    SYARAT WAJIB:
-    1. Tujuan Pembelajaran: 4-5 poin berbeda.
-    2. Kegiatan Inti: MINIMAL 4 kegiatan bervariasi per hari. JANGAN ada yang kosong.
-    3. Rentang Hari: Sesuai "${schoolInfo.hariTanggal}".
-    4. Penyambutan HARUS BERBEDA TIAP HARI dalam 'jadwalHarian': Kalimat panjang, hangat, motivatif, dan UNIK. DILARANG KERAS menggunakan kalimat yang sama untuk hari yang berbeda.
-    5. 'kegiatanInti' dalam 'pengalamanBelajar' HARUS berisi minimal 4 kegiatan yang berbeda dan mendalam untuk setiap harinya. JANGAN ada hari yang kegiatannya kosong atau hanya sedikit.
+    PENTING:
+    - Pada bagian 'jadwalHarian', kolom 'kegiatanPenyambutan' JANGAN diisi dengan jam/waktu (seperti 07.30 - 08.00).
+    - Isi 'kegiatanPenyambutan' dengan deskripsi singkat bagaimana guru menyambut anak (contoh: "Penyambutan dengan senyum dan sapa", "Menyambut anak dengan ceria", dll).
     
-    PENTING: Output JSON valid. 'kegiatanPenyambutan' JANGAN isi jam.
-    
+    Output HARUS dalam format JSON valid.
     Skema JSON:
     {
       "informasiUmum": { "tema": "", "subTema": "", "usia": "", "mingguSemester": "", "alokasiWaktu": "", "hariTanggal": "" },
       "asesmenAwal": { "deskripsi": "", "poinPoin": [], "instrumen": [] },
       "identifikasi": { "dimensiProfilLulusan": [] },
       "desainPembelajaran": { "tujuanPembelajaran": [], "praktikPedagogis": [], "kemitraan": { "orangTua": [], "lingkunganSekolah": [], "lingkunganPembelajaran": [] }, "pemanfaatanDigital": [] },
-      "pengalamanBelajar": { 
-        "penyambutan": "Deskripsi umum penyambutan", 
-        "jadwalHarian": [{ "hari": "Senin", "kegiatanPenyambutan": "Deskripsi UNIK Senin", "kegiatan": "Kegiatan rutin" }], 
-        "pembukaan": [], 
-        "memahami": [], 
-        "kegiatanInti": [{ "hari": "Senin", "kegiatan": ["Kegiatan 1", "Kegiatan 2", "Kegiatan 3", "Kegiatan 4"] }], 
-        "mengaplikasi": [], 
-        "merefleksi": [], 
-        "penutup": "" 
-      },
+      "pengalamanBelajar": { "penyambutan": "", "jadwalHarian": [{ "hari": "", "kegiatanPenyambutan": "", "kegiatan": "" }], "pembukaan": [], "memahami": [], "kegiatanInti": [{ "hari": "", "kegiatan": [] }], "mengaplikasi": [], "merefleksi": [], "penutup": "" },
       "asesmenPembelajaran": ""
     }`;
 
-  const result = await askAI(`Tema: ${prompt}. Info: ${JSON.stringify(schoolInfo)}. JSON output.`, systemInstruction, true);
+  const result = await askAI(`Tema/topik: ${prompt}. Berikan output dalam format JSON sesuai skema.`, systemInstruction, true);
   const cleaned = cleanJson(result);
   try {
     return JSON.parse(cleaned);

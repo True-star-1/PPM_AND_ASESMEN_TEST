@@ -376,7 +376,7 @@ export default function AnekdotGenerator({ onBack, ppmData }: AnekdotGeneratorPr
                     <div key={item.id} className="bg-stone-50 p-4 rounded-xl border border-stone-100 relative group">
                       <button 
                         onClick={() => handleDeleteItem(item.id)}
-                        className="absolute top-4 right-4 text-stone-400 hover:text-red-500 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                        className="absolute top-4 right-4 text-stone-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                         title="Hapus"
                       >
                         <Trash2 size={18} />

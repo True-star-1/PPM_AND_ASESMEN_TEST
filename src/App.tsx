@@ -35,33 +35,17 @@ export default function App() {
     },
     asesmenAwal: {
       deskripsi: '',
-      poinPoin: [],
-      instrumen: []
-    },
-    identifikasi: {
-      dimensiProfilLulusan: []
+      poinPoin: []
     },
     desainPembelajaran: {
       tujuanPembelajaran: [],
-      praktikPedagogis: [],
-      kemitraan: {
-        orangTua: [],
-        lingkunganSekolah: [],
-        lingkunganPembelajaran: []
-      },
-      pemanfaatanDigital: []
+      kegiatanPembelajaran: []
     },
     pengalamanBelajar: {
-      penyambutan: '',
-      jadwalHarian: [],
-      pembukaan: [],
-      memahami: [],
+      kegiatanPembukaan: [],
       kegiatanInti: [],
-      mengaplikasi: [],
-      merefleksi: [],
-      penutup: ''
-    },
-    asesmenPembelajaran: ''
+      kegiatanPenutup: []
+    }
   };
 
   return (
